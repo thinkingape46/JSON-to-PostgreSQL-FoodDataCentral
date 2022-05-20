@@ -1,6 +1,8 @@
 const { createReadStream, writeFileSync } = require("fs");
 
-const streamf = createReadStream("./survey_foods.json", {
+const FoodNutritionModel = require("./food.nutrition.model");
+
+const streamf = createReadStream("./survey_food.json", {
   flags: "r",
   encoding: "utf-8",
 });
@@ -16,11 +18,13 @@ streamf.on("end", () => {
   const newJson = [];
 
   foodJson.SurveyFoods.forEach((food) => {
+    const foodNutrients = new FoodNutritionModel(food);
+    const nutrientInformation = foodNutrients.nutrientInformation();
+
     const newFood = {
       foodName: food.description,
-      foodNutrients: food.foodNutrients,
-      foodAttributes: food.foodAttributes,
       fdcId: food.fdcId,
+      ...nutrientInformation,
       publicationDate: food.publicationDate,
       addedBy: "Admin",
       addedOn: new Date().toJSON(),
@@ -30,10 +34,7 @@ streamf.on("end", () => {
   });
 
   try {
-    writeFileSync(
-      "./survey-foods.json",
-      JSON.stringify({ surveyFoods: newJson })
-    );
+    writeFileSync("./result.json", JSON.stringify({ surveyFoods: newJson }));
   } catch (error) {
     throw error;
   }

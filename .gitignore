@@ -1,3 +1,3 @@
 .env
-*.json
+*.zip
 node_modules/
